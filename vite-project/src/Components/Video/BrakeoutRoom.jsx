@@ -3,6 +3,7 @@ import { Users, UserPlus, ArrowLeftCircle, Search, Settings, X } from 'lucide-re
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import PropTypes from 'prop-types';
 import { toast } from 'react-hot-toast';
+// import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 function BreakoutRooms({ breakoutRooms, participants, onCreateRoom, onMoveParticipant, onDeleteRoom, onRenameRoom }) {
   const [isCreatingRoom, setIsCreatingRoom] = useState(false);
