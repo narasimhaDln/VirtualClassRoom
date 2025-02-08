@@ -1,6 +1,5 @@
 # React + Vite
 
-
 Practical Images of Project:
 Live Class ScreenShot:
 ![IMG_20250208_214523](https://github.com/user-attachments/assets/c4e31777-43f5-46bc-81c9-7940ef83e37f)
@@ -9,13 +8,11 @@ Login Page ScreenShot:
 Assignments Page ScreenShot:
 ![IMG_20250208_214509](https://github.com/user-attachments/assets/0655a178-8a11-4710-aa4b-00d07226e2a5)
 
-
 Deployment URL:https://virtual-class-room-r3dw.vercel.app/
 
 Git Hub URL:https://github.com/narasimhaDln/VirtualClassRoom/tree/main/vite-project
 
-
-***Video****
+**\*Video\*\***
 => Brakeout Room Component:
 1 .Room Management: Create and manage multiple virtual breakout rooms where participants can be divided into smaller groups for focused discussions or activities.
 
@@ -29,87 +26,104 @@ Git Hub URL:https://github.com/narasimhaDln/VirtualClassRoom/tree/main/vite-proj
 
 => VideoConference Component
 Packages:
+
 # Core Dependencies
+
 npm install react react-dom
 
 # UI Icons
+
 npm install lucide-react
 
 # Notifications
+
 npm install react-hot-toast
 
 # Media Handling
+
 # (Built-in browser APIs are used, no additional packages needed)
 
 # Optional Styling
+
 npm install tailwindcss
 npm install @tailwindcss/forms
 
 # Optional - For Virtual Background
+
 npm install @tensorflow/tfjs @tensorflow-models/body-pix
 
 # Optional - For Better Media Handling
+
 npm install mediasoup-client
 
 # Optional - For Better State Management
+
 npm install zustand
+
 # or
+
 npm install @reduxjs/toolkit react-redux
 
 1. **Video/Audio Controls**
-> Camera toggle (on/off)
-> Microphone toggle (mute/unmute)
-> Screen sharing
-> Background blur
-> Virtual background support
-> Audio level monitoring
+
+   > Camera toggle (on/off)
+   > Microphone toggle (mute/unmute)
+   > Screen sharing
+   > Background blur
+   > Virtual background support
+   > Audio level monitoring
 
 2. **Recording Features**
-> Start/stop recording
-> Download recordings
-> Screen capture support
+
+   > Start/stop recording
+   > Download recordings
+   > Screen capture support
 
 3. **Meeting Management**
-> Meeting duration timer
-> Participant management
-> Meeting status display (quality, participants count)
-> Full-screen mode
-> Layout controls
-> Breakout rooms
+
+   > Meeting duration timer
+   > Participant management
+   > Meeting status display (quality, participants count)
+   > Full-screen mode
+   > Layout controls
+   > Breakout rooms
 
 4. **Interactive Features**
-> Hand raising with queue system
-> Chat functionality
-> Polling system
-> Meeting notes
-> Emoji reactions
-> Keyboard shortcuts
+   > Hand raising with queue system
+   > Chat functionality
+   > Polling system
+   > Meeting notes
+   > Emoji reactions
+   > Keyboard shortcuts
 5. **Device Management**
-> Camera selection
-> Microphone selection
-> Audio output control
-> Network quality monitoring
+
+   > Camera selection
+   > Microphone selection
+   > Audio output control
+   > Network quality monitoring
 
 6. **UI Elements**
-> Status bar
-> Control bar
-> Settings panel
-> Various modal dialogs
-> Picture-in-picture view
-=> Whiteboard Component
-> Drawing tools (pencil, eraser, color picker)
-> Text input
-> Shape drawing
-> Image upload
-> Undo/redo functionality
+   > Status bar
+   > Control bar
+   > Settings panel
+   > Various modal dialogs
+   > Picture-in-picture view
+   > => Whiteboard Component
+   > Drawing tools (pencil, eraser, color picker)
+   > Text input
+   > Shape drawing
+   > Image upload
+   > Undo/redo functionality
 
 => Chat Panel Component
+
 > Basic chat functionality
 > File sharing
 > Emoji reactions
 > Message reactions
 
 => Course Management Component
+
 > Course creation
 > Course management
 > Enrollment management
@@ -117,44 +131,45 @@ npm install @reduxjs/toolkit react-redux
 > Certificate generation
 
 =>Screen Sharing Component
+
 > Screen sharing functionality
 > Audio controls (mute/unmute)
 > Participant list management
 > Hand raising feature
 > Background blur/effects
-=>MeetingNotes Component
+> =>MeetingNotes Component
 > Meeting notes creation
 > Meeting notes management
 > Meeting notes sharing
 > Meeting notes editing
 > Meeting notes deleting
-=>ParticipentVideo Component
+> =>ParticipentVideo Component
 > Participent video functionality
 > Participent video management
 > Participent video sharing
-=>UseMediaStream
+> =>UseMediaStream
 > Media stream functionality
 > Media stream management
 > Media stream sharing
 > Media stream editing
 > Media stream deleting
-=>File Sharing
+> =>File Sharing
 > Image and document upload support
 > File size validation (5MB limit)
 > Preview for image files
 > Download option for files
 > Supported formats: images, PDF, DOC, DOCX
-=>ChatPanel Component
+> =>ChatPanel Component
 > Basic chat functionality
 > File sharing
 > Emoji reactions
 > Message reactions
-=>ClassInfo Component
-**Class Information Display**
+> =>ClassInfo Component
+> **Class Information Display**
 > Shows class name, room number, and live status
 > Visual indicators for live/offline status
 > Clean UI with icons and responsive design
-**Schedule Management**
+> **Schedule Management**
 > Modal popup showing class schedule
 > Displays weekly schedule (Mon/Wed/Fri)
 > Time slots with calendar icons
@@ -166,35 +181,46 @@ npm install @reduxjs/toolkit react-redux
 > Quick access to join office hours
 > Opens Zoom link in new tab
 > Loading state with toast notification
-Required Packages:  
+> Required Packages:
+
 # Core packages
+
 -> npm install react
 
 # UI Components and Icons
--> npm install lucide-react    # For Calendar and other icons
+
+-> npm install lucide-react # For Calendar and other icons
 
 # Toast Notifications
-# (Current implementation uses custom hook 'useToast', 
+
+# (Current implementation uses custom hook 'useToast',
+
 # but you could use one of these alternatives):
+
 -> npm install react-hot-toast
+
 # OR
+
 -> npm install react-toastify
 
 # Styling
+
 # The component uses Tailwind CSS, so you'll need:
+
 -> npm install tailwindcss postcss autoprefixer
 
 =>Navigation Component
 **Navigation Bar**
+
 > Logo with "Virtual Classroom" title
 > Main navigation menu (Dashboard, Courses, Calendar, Resources)
 > Responsive design (mobile/desktop)
-**Notifications System**
+> **Notifications System**
 > Bell icon with unread indicator
 > Dropdown notification panel
 > Different notification types (warning, info, success)
 > Mark all as read functionality
-**User Profile Menu**
+> **User Profile Menu**
 > User avatar display
 > Username display (visible on desktop)
 > Dropdown menu with options:
@@ -202,68 +228,81 @@ Required Packages:
 > My Courses
 > Preferences
 > Sign Out
-**Settings Button**
+> **Settings Button**
 > Quick access to settings (currently shows toast message)
-Required Packages:
+> Required Packages:
+
 # Core Dependencies
+
 ->npm install react react-dom react-router-dom
 
 # UI Icons
+
 ->npm install lucide-react
 
 # Optional but recommended for enhanced styling
+
 ->npm install tailwindcss
-->npm install @headlessui/react    # For better dropdowns
-->npm install framer-motion        # For smooth animations
+->npm install @headlessui/react # For better dropdowns
+->npm install framer-motion # For smooth animations
 
 # Toast Notifications (choose one)
+
 ->npm install react-hot-toast
+
 # or
+
 ->npm install react-toastify
 **Additional Notes**
 The component uses custom hooks:
+
 > useToast (custom hook for notifications)
-> useNavigate (from react-router-dom)   
-=>Sidebar Component
-**Instructor Information Display**
+> useNavigate (from react-router-dom)  
+> =>Sidebar Component
+> **Instructor Information Display**
 > Shows instructor's avatar, name, department
 > Quick access buttons for email and office hours
-**Class Schedule Section**
+> **Class Schedule Section**
 > Displays class timing (Mon, Wed, Fri)
 > Shows room location
-**Assignments Tracker**
+> **Assignments Tracker**
 > Lists upcoming assignments
 > Color coding (orange for important, blue for regular)
 > Status badges (completed/pending)
 > Interactive cards with hover effects
 > "View All" option
-**Resources Section**
+> **Resources Section**
 > Quick access to course materials
 > Interactive buttons with icons
 > Hover effects with external link icon
 > Different icons for different resource types
-Required Packages:
-
+> Required Packages:
 
 # Core Dependencies
+
 ->npm install react
 
 # UI Icons
+
 ->npm install lucide-react
 
 # For styling (already using Tailwind CSS)
+
 ->npm install tailwindcss
-->npm install @tailwindcss/forms   # Optional - for better form styling
+->npm install @tailwindcss/forms # Optional - for better form styling
 
 # For notifications (custom hook useToast is being used)
+
 # You might want to consider these toast libraries:
+
 ->npm install react-hot-toast
+
 # OR
+
 ->npm install react-toastify
 
-
-
 <!-- Alam work -->
+
 #Assignment Component
 
 This React component allows users to answer and submit assignments with support for text, multiple-choice, and code-based questions.
@@ -278,14 +317,14 @@ This React component allows users to answer and submit assignments with support 
 
 # Assignment List Component
 
-This React component displays a list of assignments with details like title, subject, 
+This React component displays a list of assignments with details like title, subject,
 question count, total points, and due time. Users can view assignments by clicking the "View Assignment" button.
 
 ## Features
+
 - Displays assignment details in a card layout
 - Shows total questions and points
 - Allows users to view assignments with a button click
-
 
 # Code Editor Component
 
@@ -293,10 +332,10 @@ This React component provides a code editor with syntax highlighting, language s
 and execution support. It allows users to write, copy, and run code in multiple programming languages.
 
 ## Features
-- Supports multiple programming languages  
-- Allows users to write, copy, and execute code  
-- Displays real-time code output  
 
+- Supports multiple programming languages
+- Allows users to write, copy, and execute code
+- Displays real-time code output
 
 # Submitted Assignments Component
 
@@ -304,19 +343,21 @@ This React component fetches and displays submitted assignments from a Firebase 
 It shows assignment details, submission status, answers, and total points.
 
 ## Features
-- Fetches submissions from Firebase  
-- Displays assignment details and answers  
-- Shows submission status and total points  
+
+- Fetches submissions from Firebase
+- Displays assignment details and answers
+- Shows submission status and total points
 
 # useToast Hook
 
-A custom React hook for displaying toast notifications with different 
+A custom React hook for displaying toast notifications with different
 message types (info, success, error, warning). It provides a `showToast` function to trigger toasts and a `ToastContainer` component to render them.
 
 ## Features
-- Supports multiple toast types  
-- Auto-dismisses after 3 seconds  
-- Easy to integrate into any React project  
+
+- Supports multiple toast types
+- Auto-dismisses after 3 seconds
+- Easy to integrate into any React project
 
 # AuthContext (Authentication Provider)
 
@@ -324,14 +365,15 @@ A React authentication context that manages user login, logout, and token verifi
 It provides an `AuthProvider` component and a `useAuth` hook for easy authentication handling.
 
 ## Features
-- Stores user authentication state  
-- Verifies tokens from localStorage  
-- Provides login and logout functionality  
+
+- Stores user authentication state
+- Verifies tokens from localStorage
+- Provides login and logout functionality
 
 # Virtual Classroom Login Component
 
 This React component provides a user-friendly interface for logging into a virtual classroom application.
-It supports email/password authentication, account creation, and GitHub OAuth login. 
+It supports email/password authentication, account creation, and GitHub OAuth login.
 The UI is designed with a modern, responsive layout and includes features like password visibility toggle and form validation.
 
 # ProtectedRoute Component
@@ -340,28 +382,32 @@ The `ProtectedRoute` component in React ensures that only authenticated users ca
 It utilizes `useAuth` to check user authentication status. If the user is not authenticated, they are redirected to the login page.
 
 ## Features
+
 - Displays a loading spinner while authentication is in progress.
 - Redirects unauthenticated users to the `/login` page.
 - Wraps around protected components to restrict access.
 
 ## Usage
+
 Wrap the `ProtectedRoute` aroun# Register Component
 
 The `Register` component allows users to create an account for the virtual classroom. It includes form fields for name, email, and password, with real-time validation and a loading state. The component interacts with Firebase for user registration and redirects users upon successful signup.
 
 ## Features
+
 - Displays a loading state during registration.
 - Checks for existing users before creating a new account.
 - Uses Firebase Realtime Database for storing user details.
 - Includes password visibility toggle for better user experience.
-;d components that require authentication:
+  ;d components that require authentication:
+
 ```jsx
 <ProtectedRoute>
   <Dashboard />
 </ProtectedRoute>
 ### Register Component
 
-The `Register` component allows users to create an account for the virtual classroom. 
+The `Register` component allows users to create an account for the virtual classroom.
 It includes form fields for name, email, and password, with real-time validation and a loading state.
 The component interacts with Firebase for user registration and redirects users upon successful signup.
 
@@ -392,7 +438,7 @@ Custom calendar component React aur Tailwind CSS ka use karke banaya gaya hai. I
 
 3. *Custom Date Cell*
    - Date number display
-   - Event indicators 
+   - Event indicators
    - Current date highlighting
    - Selected date highlighting
 
@@ -613,4 +659,5 @@ Add more security features like 2FA (Two-Factor Authentication).
 
 Allow users to customize email and push notification preferences in detail.
 
-Implement AI-powered insights for user activity tracking.
+Implement AI-powered insights for user activity tracking..
+```
