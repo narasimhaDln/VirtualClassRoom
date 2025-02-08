@@ -17,7 +17,14 @@ import { useAuth } from './Components/User/AuthContext';
 import { AssignmentList } from './Components/Assignments/AssignmentList';
 import { Assignment } from './Components/Assignments/Assignment';
 import { SubmittedAssignments } from './Components/Assignments/SubmittedAssignments';
-
+import { toast } from 'react-hot-toast';
+import Participants from './Components/Participents';
+import Resources from './Routing/Resourses';
+import Calendar from './Routing/Calender';
+import Courses from './Routing/Courses';
+import Profile from './Components/User/Profile';
+import SettingsPage from "./Components/Settings/SettingsPage"
+import ChangePassword from './Components/Settings/ChangePassword';
 function MainApp() {
   const [activeTab, setActiveTab] = useState('whiteboard');
   const [isRaiseHand, setIsRaiseHand] = useState(false);
@@ -31,6 +38,7 @@ function MainApp() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [answers, setAnswers] = useState({});
 
+
   const supportedLanguages = [
     { id: 'javascript', name: 'JavaScript', icon: '⚡' },
     { id: 'python', name: 'Python', icon: '🐍' },
@@ -42,34 +50,62 @@ function MainApp() {
   const scheduledClasses = [
     {
       id: 1,
-      name: 'Mathematics 101',
-      instructor: 'Dr. Sarah Johnson',
+      name: 'Javascript',
+      instructor: 'Wes Bos ',
       startTime: '10:00 AM',
       duration: '1h',
-      topic: 'Differential Equations',
+      topic: 'Higher Order Functions && Promises',
       status: 'upcoming'
     }
   ];
 
   const upcomingClasses = [
     {
-      id: 2,
-      name: "Javascript",
-      instructor: 'Dr. Michael Brown',
-      startTime: '2:00 PM',
+      id:1,
+      name: 'Algorithms',
+      instructor: 'Priyanka',
+      startTime: '11:30AM-1:30PM',
       duration: '1h',
-      topic: 'Quantum Mechanics',
+      topic: 'Binary Search/Solving Problems',
+      status: 'upcoming'
+    },
+    {
+      id: 2,
+      name: 'Data Structures',
+      instructor: 'Dr. Emily White',
+      startTime: '3:00-4:00 PM',
+      duration: '1h',
+      topic: 'Sliding Window',
       status: 'upcoming'
     },
     {
       id: 3,
-      name: 'React.js',
-      instructor: 'Dr. Emily White',
-      startTime: '4:00 PM',
+      name: "React.js",
+      instructor: 'Narayana',
+      startTime: '6:00PM-8:00PM',
       duration: '1h',
-      topic: 'Organic Chemistry',
+      topic: 'State Management && Context API',
       status: 'upcoming'
+    },
+    {
+      id: 4,
+      name: "Apptitude",
+      instructor: 'Hemanth',
+      startTime: '8:30PM-9:30PM',
+      duration: '1h',
+      topic: 'Permatations&Combinations && Number System',
+      status: 'upcoming'
+    },
+    {
+      id:5,
+      name:'Standup',
+      instructor:'D.Naveen',
+      startTime:'10:00PM-11:00PM',
+      duration:'1h',
+      topic:'Problem Solving',
+      status:'upcoming'
     }
+
   ];
 
   const todaysAssignments = [
@@ -98,7 +134,40 @@ function MainApp() {
           type: 'multiple',
           options: ['Arrow Functions', 'let/const', 'Promises', 'async/await'],
           points: 5
+        },
+        {
+          id: 4,
+          question: 'What are the differences between null and undefined in JavaScript?',
+          type: 'text',
+          points: 5
+        },
+        {
+          id: 5,
+          question: 'Write a function to debounce an input event in JavaScript.',
+          type: 'code',
+          points: 10
+        },
+        {
+          id: 6,
+          question: 'Which of the following are JavaScript data types?',
+          type: 'multiple',
+          options: ['String', 'Number', 'Boolean', 'Class'],
+          points: 5
+        },
+        {
+          id: 7,
+          question: 'Explain the concept of event delegation in JavaScript.',
+          type: 'text',
+          points: 5
+        },
+        {
+          id: 8,
+          question: 'Which methods can be used to iterate over an array in JavaScript?',
+          type: 'multiple',
+          options: ['forEach', 'map', 'filter', 'reduce'],
+          points: 5
         }
+        
       ]
     },
     {
@@ -119,20 +188,49 @@ function MainApp() {
           question: 'Explain the difference between useEffect and useLayoutEffect.',
           type: 'text',
           points: 5
+        },
+        {
+          id: 3,
+          question: 'What is the significance of the dependency array in useEffect?',
+          type: 'text',
+          points: 5
+        },
+        {
+          id: 4,
+          question: 'How does React reconcile changes in the Virtual DOM?',
+          type: 'text',
+          points: 5
+        },
+        {
+          id: 5,
+          question: 'Explain the difference between controlled and uncontrolled components in React.',
+          type: 'text',
+          points: 5
         }
+        
       ]
     }
   ];
 
   const handleJoinClass = (classInfo) => {
-    setShowVideoConference(true);
-    toast.success(`Joining ${classInfo.name}`);
+    try {
+      setShowVideoConference(true);
+      if (toast && typeof toast.success === 'function') {
+        toast.success(`Joining ${classInfo.name}`);
+      }
+    } catch (error) {
+      console.error('Error joining class:', error);
+      if (toast && typeof toast.error === 'function') {
+        toast.error('Failed to join class');
+      }
+    }
   };
 
   const instructor = {
-    name: 'Dr. Sarah Johnson',
-    department: 'Mathematics Department',
-    avatar: 'https://source.unsplash.com/random/40x40?teacher',
+    topic: 'Javascript',
+    name: 'Sahil Chopra',
+    department: 'Computer Science Department',
+    avatar: 'https://bit.ly/dan-abramov',
     status: 'online',
     expertise: 'Advanced Calculus'
   };
@@ -172,14 +270,7 @@ function MainApp() {
       // Simulate execution delay
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // // Mock output based on language
-      // const outputs = {
-      //   javascript: 'console.log("Hello World!") → Hello World!',
-      //   python: 'print("Hello World!") → Hello World!',
-      //   java: 'System.out.println("Hello World!") → Hello World!',
-      //   cpp: 'cout << "Hello World!" → Hello World!',
-      //   c: 'printf("Hello World!") → Hello World!'
-      // };
+     
       
       setCodeOutput(outputs[language] || 'Code executed successfully!');
     } catch (error) {
@@ -369,6 +460,7 @@ function MainApp() {
                       >
                         <Hand size={20} />
                       </button>
+
                       <button
                         onClick={handleScreenShare}
                         className={`p-2 rounded-full ${
@@ -432,7 +524,7 @@ function MainApp() {
                     {activeTab === 'chat' && <Chat />}
                     {activeTab === 'participants' && (
                       <div className="space-y-4">
-                        {/* Add your participants list component here */}
+                    <Participants/>
                       </div>
                     )}
                   </div>
@@ -449,7 +541,7 @@ function MainApp() {
           </main>
         </div>
       )}
-
+   
       <ToastContainer />
     </>
   );
@@ -457,10 +549,12 @@ function MainApp() {
 
 function App() {
   return (
+   
     <Router>
       <AuthProvider>
         <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
           <Toaster position="top-right" />
+      
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login />} />
@@ -473,10 +567,41 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/resources"
+              element={
+                <ProtectedRoute>
+                  <Resources />
+                </ProtectedRoute>
+              }
+              
+            />
+              <Route
+              path="/calender"
+              element={
+                <ProtectedRoute>
+                  <Calendar />
+                </ProtectedRoute>
+              }
+              
+            />
+            <Route
+              path="/courses"
+              element={
+                <ProtectedRoute>
+                  <Courses />
+                </ProtectedRoute>
+              }
+              />
+            <Route path='/profile' element={<Profile />} />
+             <Route path='/settings' element={<SettingsPage />} /> 
+            <Route path='/change-password' element={<ChangePassword />} />
+            
           </Routes>
         </div>
       </AuthProvider>
     </Router>
+  
   );
 }
 

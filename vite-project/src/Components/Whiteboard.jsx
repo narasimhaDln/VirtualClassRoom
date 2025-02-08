@@ -1,429 +1,338 @@
-import React, { useRef, useEffect, useState } from 'react';
-import { Eraser, Pencil, Undo2, Redo2, Trash2, Square, Circle, Type, Image as ImageIcon, Download, 
-  Minus, ArrowRight, Move, ZoomIn, ZoomOut } from 'lucide-react';
+import { useRef, useEffect, useState } from "react";
 
-export default function Whiteboard() {
+const TOOLS = {
+  PENCIL: "pencil",
+  ERASER: "eraser",
+  TEXT: "text",
+};
+
+export default function WhiteboardDashboard() {
   const canvasRef = useRef(null);
-  const [tool, setTool] = useState('pen');
-  const [color, setColor] = useState('#000000');
-  const [size, setSize] = useState(2);
+  const [ctx, setCtx] = useState(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [actions, setActions] = useState([]);
-  const [redoStack, setRedoStack] = useState([]);
-  const [currentAction, setCurrentAction] = useState(null);
-  const [showTextInput, setShowTextInput] = useState(false);
-  const [textInput, setTextInput] = useState('');
-  const [textPosition, setTextPosition] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [pan, setPan] = useState({ x: 0, y: 0 });
-  const [isPanning, setIsPanning] = useState(false);
-  const [currentTool, setCurrentTool] = useState('pen');
-  
-  const presetColors = ['#000000', '#FF0000', '#00FF00', '#0000FF', '#FFFF00', '#FF00FF', '#00FFFF'];
+  const [tool, setTool] = useState(TOOLS.PENCIL);
+  const [color, setColor] = useState("#000000");
+  const [lineWidth, setLineWidth] = useState(2);
+  const [fontSize, setFontSize] = useState(16);
+  const [fontFamily, setFontFamily] = useState("Arial");
+  const [text, setText] = useState("");
+  const [history, setHistory] = useState([]);
+  const [historyIndex, setHistoryIndex] = useState(-1);
+  const [notes, setNotes] = useState([]);
+  const [newNote, setNewNote] = useState("");
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showNotes, setShowNotes] = useState(true);
 
+  // Initialize canvas with responsive dimensions
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const context = canvas.getContext('2d');
-    if (!context) return;
-
-    // Set canvas size
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    // Draw grid
-    const drawGrid = () => {
-      const gridSize = 20;
-      context.strokeStyle = '#EEEEEE';
-      context.lineWidth = 0.5;
-
-      for (let x = 0; x < canvas.width; x += gridSize) {
-        context.beginPath();
-        context.moveTo(x, 0);
-        context.lineTo(x, canvas.height);
-        context.stroke();
-      }
-
-      for (let y = 0; y < canvas.height; y += gridSize) {
-        context.beginPath();
-        context.moveTo(0, y);
-        context.lineTo(canvas.width, y);
-        context.stroke();
-      }
-    };
-
-    drawGrid();
-    redrawCanvas();
-  }, [zoom, pan]);
-
-  const redrawCanvas = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const context = canvas.getContext('2d');
-    if (!context) return;
-
-    context.clearRect(0, 0, canvas.width, canvas.height);
-
-    actions.forEach(action => {
-      drawAction(context, action);
-    });
-  };
-
-  const drawAction = (context, action) => {
-    context.strokeStyle = action.color || '#000000';
-    context.lineWidth = action.size || 2;
-    context.lineCap = 'round';
-
-    switch (action.tool) {
-      case 'pen':
-        if (action.points && action.points.length > 1) {
-          context.beginPath();
-          context.moveTo(action.points[0].x, action.points[0].y);
-          action.points.forEach((point, i) => {
-            if (i > 0) {
-              context.lineTo(point.x, point.y);
-            }
-          });
-          context.stroke();
+    if (canvas) {
+      const context = canvas.getContext("2d");
+      setCtx(context);
+      
+      const resizeCanvas = () => {
+        const container = canvas.parentElement;
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+        // Restore previous drawing after resize
+        if (history.length > 0 && historyIndex >= 0) {
+          context.putImageData(history[historyIndex], 0, 0);
         }
-        break;
-      case 'rectangle':
-        if (action.position && action.dimensions) {
-          context.strokeRect(
-            action.position.x,
-            action.position.y,
-            action.dimensions.width,
-            action.dimensions.height
-          );
-        }
-        break;
-      case 'circle':
-        if (action.position && action.dimensions) {
-          context.beginPath();
-          context.ellipse(
-            action.position.x + action.dimensions.width / 2,
-            action.position.y + action.dimensions.height / 2,
-            Math.abs(action.dimensions.width / 2),
-            Math.abs(action.dimensions.height / 2),
-            0,
-            0,
-            2 * Math.PI
-          );
-          context.stroke();
-        }
-        break;
-      case 'text':
-        if (action.position && action.text) {
-          context.font = '16px Arial';
-          context.fillStyle = action.color || '#000000';
-          context.fillText(action.text, action.position.x, action.position.y);
-        }
-        break;
-      case 'line':
-        if (action.points && action.points.length === 2) {
-          context.beginPath();
-          context.moveTo(action.points[0].x, action.points[0].y);
-          context.lineTo(action.points[1].x, action.points[1].y);
-          context.stroke();
-        }
-        break;
-      case 'arrow':
-        if (action.points && action.points.length === 2) {
-          const angle = Math.atan2(
-            action.points[1].y - action.points[0].y,
-            action.points[1].x - action.points[0].x
-          );
-          const headLength = 15;
+      };
 
-          context.beginPath();
-          context.moveTo(action.points[0].x, action.points[0].y);
-          context.lineTo(action.points[1].x, action.points[1].y);
-          
-          context.lineTo(
-            action.points[1].x - headLength * Math.cos(angle - Math.PI / 6),
-            action.points[1].y - headLength * Math.sin(angle - Math.PI / 6)
-          );
-          context.moveTo(action.points[1].x, action.points[1].y);
-          context.lineTo(
-            action.points[1].x - headLength * Math.cos(angle + Math.PI / 6),
-            action.points[1].y - headLength * Math.sin(angle + Math.PI / 6)
-          );
-          context.stroke();
-        }
-        break;
+      resizeCanvas();
+      window.addEventListener('resize', resizeCanvas);
+      saveState();
+
+      return () => window.removeEventListener('resize', resizeCanvas);
+    }
+  }, []);
+
+  // Save canvas state to history
+  const saveState = () => {
+    if (canvasRef.current && ctx) {
+      requestAnimationFrame(() => {
+        const imageData = ctx.getImageData(0, 0, canvasRef.current.width, canvasRef.current.height);
+        const newHistory = history.slice(0, historyIndex + 1);
+        newHistory.push(imageData);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+      });
     }
   };
 
-  const startDrawing = (e) => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    if (tool === 'text') {
-      setTextPosition({ x, y });
-      setShowTextInput(true);
-      return;
+  // Undo functionality
+  const undo = () => {
+    if (historyIndex > 0) {
+      const prevState = history[historyIndex - 1];
+      ctx.putImageData(prevState, 0, 0);
+      setHistoryIndex(historyIndex - 1);
     }
+  };
 
+  // Redo functionality
+  const redo = () => {
+    if (historyIndex < history.length - 1) {
+      const nextState = history[historyIndex + 1];
+      ctx.putImageData(nextState, 0, 0);
+      setHistoryIndex(historyIndex + 1);
+    }
+  };
+
+  // Start drawing or adding text
+  const startDrawing = ({ nativeEvent }) => {
+    if (!canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = nativeEvent.type.includes('touch') 
+      ? nativeEvent.touches[0].clientX - rect.left 
+      : nativeEvent.offsetX;
+    const y = nativeEvent.type.includes('touch') 
+      ? nativeEvent.touches[0].clientY - rect.top 
+      : nativeEvent.offsetY;
+    
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    
+    if (tool === TOOLS.ERASER) {
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = lineWidth * 2;
+    } else {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
+    }
+    
     setIsDrawing(true);
-    setCurrentAction({
-      tool,
-      color,
-      size,
-      points: [{ x, y }],
-      position: { x, y },
-      dimensions: { width: 0, height: 0 },
-    });
   };
 
-  const draw = (e) => {
-    if (!isDrawing || !currentAction) return;
+  // Draw or erase
+  const draw = ({ nativeEvent }) => {
+    if (!isDrawing || !canvasRef.current) return;
+    const rect = canvasRef.current.getBoundingClientRect();
+    const x = nativeEvent.type.includes('touch') 
+      ? nativeEvent.touches[0].clientX - rect.left 
+      : nativeEvent.offsetX;
+    const y = nativeEvent.type.includes('touch') 
+      ? nativeEvent.touches[0].clientY - rect.top 
+      : nativeEvent.offsetY;
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    const context = canvas.getContext('2d');
-    if (!context) return;
-
-    const newAction = { ...currentAction };
-
-    switch (tool) {
-      case 'pen':
-        newAction.points = [...(currentAction.points || []), { x, y }];
-        break;
-      case 'rectangle':
-      case 'circle':
-        newAction.dimensions = {
-          width: x - (currentAction.position?.x || 0),
-          height: y - (currentAction.position?.y || 0),
-        };
-        break;
+    if (tool === TOOLS.ERASER) {
+      ctx.strokeStyle = 'white';
+      ctx.lineWidth = lineWidth * 2;
+    } else {
+      ctx.strokeStyle = color;
+      ctx.lineWidth = lineWidth;
     }
 
-    setCurrentAction(newAction);
-    redrawCanvas();
-    drawAction(context, newAction);
+    ctx.lineTo(x, y);
+    ctx.stroke();
   };
 
+  // Stop drawing
   const stopDrawing = () => {
-    if (!isDrawing || !currentAction) return;
-    setIsDrawing(false);
-    setActions([...actions, currentAction]);
-    setRedoStack([]);
-    setCurrentAction(null);
-  };
-
-  const handleUndo = () => {
-    if (actions.length === 0) return;
-    const newActions = [...actions];
-    const undoneAction = newActions.pop();
-    if (undoneAction) {
-      setActions(newActions);
-      setRedoStack([...redoStack, undoneAction]);
-      redrawCanvas();
+    if (ctx && tool === TOOLS.PENCIL) {
+      ctx.closePath();
+      setIsDrawing(false);
+      saveState();
     }
   };
 
-  const handleRedo = () => {
-    if (redoStack.length === 0) return;
-    const newRedoStack = [...redoStack];
-    const redoneAction = newRedoStack.pop();
-    if (redoneAction) {
-      setActions([...actions, redoneAction]);
-      setRedoStack(newRedoStack);
-      redrawCanvas();
+  // Clear canvas
+  const clearCanvas = () => {
+    if (ctx && canvasRef.current) {
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+      saveState();
     }
   };
 
-  const handleClear = () => {
-    setActions([]);
-    setRedoStack([]);
-    redrawCanvas();
-  };
-
-  const handleTextSubmit = () => {
-    if (!textInput.trim()) {
-      setShowTextInput(false);
-      return;
+  // Save canvas as image
+  const saveCanvas = () => {
+    if (canvasRef.current) {
+      const dataUrl = canvasRef.current.toDataURL();
+      const a = document.createElement("a");
+      a.href = dataUrl;
+      a.download = "whiteboard.png";
+      a.click();
     }
-
-    const newAction = {
-      tool: 'text',
-      color,
-      text: textInput,
-      position: textPosition,
-    };
-
-    setActions([...actions, newAction]);
-    setTextInput('');
-    setShowTextInput(false);
-    redrawCanvas();
   };
 
-  const handleDownload = () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const dataUrl = canvas.toDataURL('image/png');
-    const link = document.createElement('a');
-    link.download = 'whiteboard.png';
-    link.href = dataUrl;
-    link.click();
+  // Add a new note
+  const addNewNote = () => {
+    if (newNote.trim()) {
+      setNotes([...notes, newNote]);
+      setNewNote("");
+    }
   };
 
-  const handleZoomIn = () => setZoom(prev => Math.min(prev + 0.1, 3));
-  const handleZoomOut = () => setZoom(prev => Math.max(prev - 0.1, 0.5));
-
-  const ToolButton = ({ tool, icon, tooltip }) => (
-    <div className="relative group">
-      <button
-        onClick={() => setCurrentTool(tool)}
-        className={`p-2 rounded ${
-          tool === currentTool ? 'bg-blue-500 text-white' : 'hover:bg-gray-200'
-        }`}
-      >
-        {icon}
-      </button>
-      <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity">
-        {tooltip}
-      </div>
-    </div>
-  );
+  // Delete a note
+  const deleteNote = (index) => {
+    const updatedNotes = notes.filter((_, i) => i !== index);
+    setNotes(updatedNotes);
+  };
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-lg">
-      <div className="flex flex-col space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex space-x-4">
-            <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg">
-              <ToolButton tool="pen" icon={<Pencil size={20} />} tooltip="Pen" />
-              <ToolButton tool="eraser" icon={<Eraser size={20} />} tooltip="Eraser" />
-              <ToolButton tool="line" icon={<Minus size={20} />} tooltip="Line" />
-              <ToolButton tool="arrow" icon={<ArrowRight size={20} />} tooltip="Arrow" />
-              <ToolButton tool="rectangle" icon={<Square size={20} />} tooltip="Rectangle" />
-              <ToolButton tool="circle" icon={<Circle size={20} />} tooltip="Circle" />
-              <ToolButton tool="text" icon={<Type size={20} />} tooltip="Text" />
-            </div>
+    <div className="min-h-screen flex flex-col bg-gray-50 p-2 sm:p-4 md:p-6">
+      {/* Header */}
+      <div className="text-center mb-2 md:mb-4">
+        <h1 className="text-lg md:text-xl font-bold text-gray-700">Virtual Whiteboard</h1>
+        <p className="text-xs md:text-sm text-gray-600">Create, Draw, and Collaborate on your Ideas!</p>
+      </div>
 
-            <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg">
-              <input
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                className="w-8 h-8 rounded cursor-pointer"
-              />
-              <div className="flex space-x-1">
-                {presetColors.map((presetColor) => (
-                  <button
-                    key={presetColor}
-                    onClick={() => setColor(presetColor)}
-                    className="w-6 h-6 rounded-full border border-gray-300"
-                    style={{ backgroundColor: presetColor }}
-                  />
-                ))}
-              </div>
-            </div>
+      {/* Mobile Menu Button */}
+      <button 
+        className="md:hidden p-2 bg-gray-50 border rounded-lg mb-2"
+        onClick={() => setShowMobileMenu(!showMobileMenu)}
+      >
+        ☰ Menu
+      </button>
 
-            <div className="flex items-center space-x-2 bg-gray-100 p-2 rounded-lg">
-              <select
-                value={size}
-                onChange={(e) => setSize(Number(e.target.value))}
-                className="p-1 border rounded"
-              >
-                <option value="2">Thin</option>
-                <option value="4">Medium</option>
-                <option value="6">Thick</option>
-              </select>
-              <div className="w-16 h-8 border rounded bg-white flex items-center justify-center">
-                <div
-                  className="rounded-full bg-black"
-                  style={{ width: size, height: size }}
-                />
-              </div>
-            </div>
+      {/* Toolbar */}
+      <div className={`bg-gray-50 p-2 md:p-4 flex flex-col md:flex-row justify-between items-start md:items-center shadow-lg border-2 border-gray-300 rounded-lg ${showMobileMenu ? 'block' : 'hidden md:flex'}`}>
+        {/* Drawing Tools */}
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
+          <div className="flex space-x-1 md:space-x-2">
+            <button
+              className={`p-1 md:p-2 border-2 shadow-sm transition ${tool === TOOLS.PENCIL ? "bg-blue-500 text-white" : "bg-gray-50"}`}
+              onClick={() => setTool(TOOLS.PENCIL)}
+            >
+              ✏️
+            </button>
+            <button
+              className={`p-1 md:p-2 border-2 shadow-sm transition ${tool === TOOLS.ERASER ? "bg-red-500 text-white" : "bg-gray-50"}`}
+              onClick={() => setTool(TOOLS.ERASER)}
+            >
+              🧹
+            </button>
+            <button
+              className={`p-1 md:p-2 border-2 shadow-sm transition ${tool === TOOLS.TEXT ? "bg-green-500 text-white" : "bg-gray-50"}`}
+              onClick={() => setTool(TOOLS.TEXT)}
+            >
+              📝
+            </button>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <button onClick={handleZoomIn} className="p-2 rounded hover:bg-gray-100">
-              <ZoomIn size={20} />
-            </button>
-            <button onClick={handleZoomOut} className="p-2 rounded hover:bg-gray-100">
-              <ZoomOut size={20} />
-            </button>
-            <button onClick={handleUndo} className="p-2 rounded hover:bg-gray-100" disabled={actions.length === 0}>
-              <Undo2 size={20} />
-            </button>
-            <button onClick={handleRedo} className="p-2 rounded hover:bg-gray-100" disabled={redoStack.length === 0}>
-              <Redo2 size={20} />
-            </button>
-            <button onClick={handleDownload} className="p-2 rounded hover:bg-gray-100">
-              <Download size={20} />
-            </button>
-            <button onClick={handleClear} className="p-2 rounded bg-red-500 text-white hover:bg-red-600">
-              <Trash2 size={20} />
-            </button>
+          <div className="flex space-x-2 items-center">
+            <input
+              type="color"
+              value={color}
+              onChange={(e) => setColor(e.target.value)}
+              className="w-8 h-8 md:w-10 md:h-10 border-2 shadow-sm cursor-pointer"
+            />
+            <input
+              type="range"
+              min="1"
+              max="20"
+              value={lineWidth}
+              onChange={(e) => setLineWidth(parseInt(e.target.value))}
+              className="w-24 md:w-32 cursor-pointer"
+            />
           </div>
+        </div>
+
+        {/* Text Options - Only show when text tool is selected */}
+        {tool === TOOLS.TEXT && (
+          <div className="flex flex-wrap gap-2 mt-2 md:mt-0 w-full md:w-auto">
+            <input
+              type="text"
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="Type text..."
+              className="p-1 md:p-2 border-2 shadow-sm bg-gray-50 w-full md:w-auto"
+            />
+            <select
+              value={fontFamily}
+              onChange={(e) => setFontFamily(e.target.value)}
+              className="p-1 md:p-2 border-2 shadow-sm bg-gray-50"
+            >
+              <option value="Arial">Arial</option>
+              <option value="Times New Roman">Times New Roman</option>
+              <option value="Verdana">Verdana</option>
+            </select>
+          </div>
+        )}
+
+        {/* Actions */}
+        <div className="flex flex-wrap gap-2 mt-2 md:mt-0">
+          <button className="p-1 md:p-2 border-2 shadow-sm bg-gray-50" onClick={undo}>
+            ↩️
+          </button>
+          <button className="p-1 md:p-2 border-2 shadow-sm bg-gray-50" onClick={redo}>
+            ↪️
+          </button>
+          <button className="p-1 md:p-2 border-2 shadow-sm bg-red-500 text-white" onClick={clearCanvas}>
+            🗑️
+          </button>
+          <button className="p-1 md:p-2 border-2 shadow-sm bg-gray-50" onClick={saveCanvas}>
+            💾
+          </button>
         </div>
       </div>
 
-      <div className="relative mt-4 border border-gray-300 rounded overflow-hidden">
-        <div
-          className="w-full h-[600px] overflow-hidden"
-          style={{
-            cursor: tool === 'pan' ? 'move' : 'crosshair',
-          }}
-        >
+      {/* Canvas and Notes Container */}
+      <div className="flex flex-col lg:flex-row mt-2 md:mt-4 gap-2 md:gap-4 flex-grow">
+        {/* Canvas Container */}
+        <div className="w-full lg:w-3/4 h-[60vh] md:h-[70vh] lg:h-auto">
           <canvas
             ref={canvasRef}
-            className="w-full h-full"
-            style={{
-              transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
-            }}
+            className="w-full h-full bg-white border-2 shadow-lg rounded-lg"
             onMouseDown={startDrawing}
             onMouseMove={draw}
             onMouseUp={stopDrawing}
-            onMouseLeave={stopDrawing}
+            onMouseOut={stopDrawing}
+            onTouchStart={startDrawing}
+            onTouchMove={draw}
+            onTouchEnd={stopDrawing}
           />
         </div>
-        
-        {showTextInput && (
-          <div
-            className="absolute bg-white p-2 rounded shadow-lg"
-            style={{ left: textPosition.x, top: textPosition.y }}
+
+        {/* Notes Section - Toggleable on mobile */}
+        <div className="w-full lg:w-1/4">
+          <button 
+            className="w-full p-2 bg-gray-200 rounded-lg mb-2 lg:hidden"
+            onClick={() => setShowNotes(!showNotes)}
           >
-            <input
-              type="text"
-              value={textInput}
-              onChange={(e) => setTextInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleTextSubmit()}
-              className="border rounded p-1"
-              autoFocus
-            />
-            <div className="flex justify-end mt-2">
-              <button
-                onClick={() => setShowTextInput(false)}
-                className="px-2 py-1 text-sm text-gray-600 hover:bg-gray-100 rounded mr-2"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleTextSubmit}
-                className="px-2 py-1 text-sm bg-blue-500 text-white rounded hover:bg-blue-600"
-              >
-                Add
-              </button>
+            {showNotes ? 'Hide Notes' : 'Show Notes'}
+          </button>
+          
+          <div className={`bg-gray-50 p-2 md:p-4 border-2 shadow-lg rounded-lg ${showNotes ? 'block' : 'hidden lg:block'}`}>
+            <h2 className="text-base md:text-lg font-semibold mb-2 md:mb-4">Notes</h2>
+            <div className="space-y-2 w-1/2 ">
+              <div className="flex space-x-2 w-1/2 " >
+                <input
+                  type="text"
+                  value={newNote}
+                  onChange={(e) => setNewNote(e.target.value)}
+                  placeholder="Add a note..."
+                  className="p-1 md:p-2 border-2 shadow-sm bg-gray-50"
+
+
+                />
+                <button
+                  onClick={addNewNote}
+                  className="p-1 md:p-2  bg-blue-500 text-white shadow-sm "
+                >
+                  ➕
+                </button>
+              </div>
+
+              <div className="max-h-[30vh] lg:max-h-[50vh] flex-grow overflow-y-auto">
+                {notes.map((note, index) => (
+                  <div
+                    key={index}
+                    className="flex justify-between items-center p-2 border-2 shadow-sm mt-2"
+                  >
+                    <span className="text-sm md:text-base">{note}</span>
+                    <button
+                      onClick={() => deleteNote(index)}
+                      className="text-red-500 hover:text-red-700"
+                    >
+                      ❌
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

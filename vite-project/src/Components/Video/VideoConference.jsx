@@ -7,7 +7,8 @@ import {
   Download, Upload, Wifi, AlertCircle, MoreHorizontal,
   ChevronRight, X, Monitor, UserCheck, Filter,
   MessageSquare, Bell, Calendar, HelpCircle, Volume1, VolumeX,
-  VideoOff, Image, BarChart2, FileText, Keyboard, Crown
+  VideoOff, Image, BarChart2, FileText, Keyboard, Crown,
+  Circle, StopCircle
 } from 'lucide-react';
 import { useMediaStream } from './UseMediaStream';
 import BreakoutRooms from './BrakeoutRoom';
@@ -106,6 +107,9 @@ export default function VideoConference() {
   const [handRaiseQueue, setHandRaiseQueue] = useState([]);
   const [isKeyboardShortcutsOpen, setIsKeyboardShortcutsOpen] = useState(false);
 
+  const [showClassVideo, setShowClassVideo] = useState(true);
+  const [layOut,setLayOut] = useState('');
+
   // Initialize media stream when component mounts
   useEffect(() => {
     const init = async () => {
@@ -170,41 +174,63 @@ export default function VideoConference() {
   };
 
   // Recording functionality
-  const startRecording = async () => {
-    try {
-      const mediaRecorder = new MediaRecorder(localStream);
-      mediaRecorderRef.current = mediaRecorder;
-      
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          setRecordedChunks(prev => [...prev, event.data]);
+  const handleRecording = async () => {
+    if (isRecording) {
+      try {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
+          mediaRecorderRef.current.stop();
+          setIsRecording(false);
+          toast.success('Recording stopped');
         }
-      };
+      } catch (error) {
+        console.error('Error stopping recording:', error);
+        toast.error('Failed to stop recording');
+      }
+    } else {
+      try {
+        const stream = await navigator.mediaDevices.getDisplayMedia({
+          video: true,
+          audio: true
+        });
 
-      mediaRecorder.start();
-      setIsRecording(true);
-      toast.success('Recording started');
-    } catch (error) {
-      toast.error('Failed to start recording');
+        const recorder = new MediaRecorder(stream, {
+          mimeType: 'video/webm;codecs=vp8,opus'
+        });
+
+        recorder.ondataavailable = (event) => {
+          if (event.data.size > 0) {
+            setRecordedChunks(prev => [...prev, event.data]);
+          }
+        };
+
+        stream.getVideoTracks()[0].onended = () => {
+          recorder.stop();
+          setIsRecording(false);
+          stream.getTracks().forEach(track => track.stop());
+        };
+
+        mediaRecorderRef.current = recorder;
+        recorder.start(1000);
+        setIsRecording(true);
+        toast.success('Recording started');
+      } catch (error) {
+        console.error('Error starting recording:', error);
+        toast.error('Failed to start recording');
+      }
     }
   };
 
-  const stopRecording = () => {
-    mediaRecorderRef.current?.stop();
-    setIsRecording(false);
-    toast.success('Recording stopped');
-  };
-
-  const downloadRecording = () => {
+  const handleDownload = () => {
+    if (recordedChunks.length === 0) return;
+    
     const blob = new Blob(recordedChunks, { type: 'video/webm' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    document.body.appendChild(a);
-    a.style = 'display: none';
     a.href = url;
-    a.download = `meeting-recording-${new Date().toISOString()}.webm`;
+    a.download = `class-recording-${new Date().toISOString()}.webm`;
     a.click();
     URL.revokeObjectURL(url);
+    setRecordedChunks([]);
   };
 
   // Toggle microphone
@@ -235,20 +261,31 @@ export default function VideoConference() {
       return;
     }
 
-    const videoTrack = localStream.getVideoTracks()[0];
-    if (videoTrack) {
-      const newVideoState = !isVideoOn;
-      videoTrack.enabled = newVideoState;
-      setIsVideoOn(newVideoState);
-      
-      // Update UI immediately
-      setParticipants(prev => prev.map(p => 
-        p.id === 1 ? { ...p, isVideoOff: !newVideoState } : p
-      ));
+    try {
+      const videoTrack = localStream.getVideoTracks()[0];
+      if (videoTrack) {
+        const newVideoState = !isVideoOn;
+        videoTrack.enabled = newVideoState;
+        
+        // Update video element visibility
+        if (localVideoRef.current) {
+          localVideoRef.current.style.display = newVideoState ? 'block' : 'none';
+        }
+        
+        setIsVideoOn(newVideoState);
+        
+        // Update participants state
+        setParticipants(prev => prev.map(p => 
+          p.id === 1 ? { ...p, isVideoOff: !newVideoState } : p
+        ));
 
-      toast.success(`Camera ${newVideoState ? 'enabled' : 'disabled'}`);
-    } else {
-      toast.error('No camera detected');
+        toast.success(`Camera ${newVideoState ? 'enabled' : 'disabled'}`);
+      } else {
+        toast.error('No camera detected');
+      }
+    } catch (error) {
+      console.error('Error toggling video:', error);
+      toast.error('Failed to toggle camera');
     }
   }, [localStream, isVideoOn]);
 
@@ -450,8 +487,8 @@ export default function VideoConference() {
   return (
     <div ref={containerRef} className="relative h-full bg-gray-900">
       {/* Meeting Status Bar */}
-      <div className="absolute top-0 left-0 right-0 bg-gray-800/90 backdrop-blur-sm px-4 py-2 flex items-center justify-between z-10">
-        <div className="flex items-center space-x-4">
+      <div className="absolute top-0 left-0 right-0 bg-gray-800/90 backdrop-blur-sm px-2 sm:px-4 py-2 flex flex-wrap sm:flex-nowrap items-center justify-between z-10">
+        <div className="flex flex-wrap sm:flex-nowrap items-center space-x-2 sm:space-x-4">
           <div className="flex items-center space-x-2">
             <Clock className="w-4 h-4 text-gray-400" />
             <span className="text-white text-sm">{meetingStatus.duration}</span>
@@ -484,52 +521,52 @@ export default function VideoConference() {
       </div>
 
       {/* Main Video Container */}
-      <div className="relative aspect-video bg-gray-800">
-        <video
-          ref={localVideoRef}
-          autoPlay
-          playsInline
-          muted
-          className={`w-full h-full object-cover ${blur ? 'backdrop-blur-sm' : ''} ${
-            !isVideoOn ? 'hidden' : ''
-          }`}
-        />
+      <div className="relative aspect-video bg-gray-800 w-full h-full">
+        {/* YouTube Class Video - Full width */}
+        <div className="absolute inset-0 w-full h-full">
+          <iframe
+            className="w-full h-full"
+            src="https://www.youtube.com/embed/EpJm0A1sINU?autoplay=1&controls=0&rel=0&disablekb=1&modestbranding=5&showinfo=0&iv_load_policy=3&fs=0&start=2&end=1020"
+            title="Class Video"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+          ></iframe>
+        </div>
 
-        {!isVideoOn && (
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
-            <div className="w-20 h-20 rounded-full bg-gray-700 flex items-center justify-center">
-              <span className="text-2xl text-white">
-                {participants.find(p => p.id === 1)?.name?.split(' ').map(n => n[0]).join('') || 'ME'}
-              </span>
-            </div>
+        {/* Single Camera View - Top right corner */}
+        <div className={`absolute top-2 sm:top-4 right-2 sm:right-4 w-[120px] sm:w-[160px] md:w-[200px] aspect-video bg-gray-800 rounded-lg overflow-hidden shadow-lg ${!isVideoOn ? 'hidden' : ''}`}>
+          <video
+            ref={localVideoRef}
+            autoPlay
+            playsInline
+            muted
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
+            <button
+              onClick={() => localVideoRef.current?.requestFullscreen()}
+              className="p-1.5 rounded-lg bg-gray-900/80 text-white hover:bg-gray-900"
+            >
+              <Maximize2 className="w-4 h-4" />
+            </button>
           </div>
-        )}
+        </div>
 
-        {/* Video Overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/70 via-black/40 to-transparent">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="relative">
-                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center">
-                  <span className="text-white font-medium">JD</span>
-                </div>
-                {!isMuted && (
-                  <div className="absolute -right-1 -bottom-1 w-4 h-4 bg-green-500 rounded-full border-2 border-gray-900" />
-                )}
-              </div>
-              <div>
-                <div className="text-white text-sm font-medium">John Doe</div>
-                <div className="text-gray-400 text-xs">Host</div>
-              </div>
-            </div>
+        {/* Avatar when camera is off */}
+        <div className={`absolute top-4 right-4 w-48 h-36 bg-gray-800 rounded-lg overflow-hidden shadow-lg flex items-center justify-center ${isVideoOn ? 'hidden' : ''}`}>
+          <div className="w-16 h-16 rounded-full bg-gray-700 flex items-center justify-center">
+            <span className="text-xl text-white">
+              {participants.find(p => p.id === 1)?.name?.split(' ').map(n => n[0]).join('') || 'ME'}
+            </span>
           </div>
         </div>
       </div>
 
       {/* Control Bar */}
-      <div className="absolute bottom-0 left-0 right-0 p-4 bg-gray-800/90 backdrop-blur-sm">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+      <div className="absolute bottom-0 left-0 right-0 p-2 sm:p-4 bg-gray-800/90 backdrop-blur-sm">
+        <div className="flex flex-wrap sm:flex-nowrap items-center justify-center sm:justify-between gap-2 sm:gap-4">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               onClick={toggleMic}
               className={`p-3 rounded-full transition-all ${
@@ -563,50 +600,46 @@ export default function VideoConference() {
               <Filter className="w-5 h-5 text-white" />
             </button>
             <button
-              onClick={isRecording ? stopRecording : startRecording}
-              className={`p-3 rounded-full transition-all ${
-                isRecording ? 'bg-red-500 hover:bg-red-600' : 'bg-gray-600 hover:bg-gray-700'
-              }`}
+              onClick={handleRecording}
+              className={`p-3 rounded-full ${
+                isRecording 
+                  ? 'bg-red-500 hover:bg-red-600' 
+                  : 'bg-gray-600 hover:bg-gray-700'
+              } transition-colors relative`}
+              title={isRecording ? 'Stop Recording' : 'Start Recording'}
             >
-              <Video className="w-5 h-5 text-white" />
+              {isRecording ? (
+                <StopCircle className="w-5 h-5 text-white" />
+              ) : (
+                <Circle className="w-5 h-5 text-white" fill="#ef4444" />
+              )}
+              {isRecording && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+              )}
             </button>
           </div>
 
-          <div className="flex items-center space-x-2">
-            <button 
-              onClick={() => setLayout('grid')}
+          <div className="flex items-center space-x-1 sm:space-x-2">
+           
+            {/*screen share button*/}
+            <button
+              onClick={handleScreenShare}
               className={`p-2 rounded-lg transition-all ${
-                layout === 'grid' ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <Grid className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => setLayout('spotlight')}
-              className={`p-2 rounded-lg transition-all ${
-                layout === 'spotlight' ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white'
-              }`}
-            >
-              <Maximize2 className="w-5 h-5" />
-            </button>
-            <button 
-              onClick={() => setLayout('presentation')}
-              className={`p-2 rounded-lg transition-all ${
-                layout === 'presentation' ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white'
+                screenStream ? 'bg-blue-500/20 text-blue-400' : 'text-gray-400 hover:text-white'
               }`}
             >
               <Monitor className="w-5 h-5" />
             </button>
-          </div>
+          </div> 
 
           <div className="flex items-center space-x-2">
             {recordedChunks.length > 0 && (
               <button
-                onClick={downloadRecording}
+                onClick={handleDownload}
                 className="p-3 rounded-full bg-gray-600 hover:bg-gray-700 transition-all"
               >
                 <Download className="w-5 h-5 text-white" />
-                    </button>
+              </button>
             )}
             <button 
               onClick={handleLeaveMeeting}
@@ -614,10 +647,10 @@ export default function VideoConference() {
             >
               <PhoneOff className="w-5 h-5" />
               <span className="font-medium">Leave</span>
-                    </button>
-                  </div>
-                  
-                      <div className="flex items-center space-x-2">
+            </button>
+          </div>
+          
+          <div className="flex items-center space-x-2">
             {/* Virtual Background Button */}
             <button
               onClick={() => setShowVirtualBackground(true)}
@@ -646,18 +679,18 @@ export default function VideoConference() {
             >
               <MessageCircle className="w-5 h-5 text-white" />
             </button>
-        </div>
+          </div>
 
           <div className="flex items-center space-x-2">
-                  <button 
+            <button 
               onClick={() => setShowNotes(true)}
               className="p-3 rounded-full bg-gray-700 hover:bg-opacity-80"
               title="Meeting Notes"
-                  >
+            >
               <FileText className="w-5 h-5 text-white" />
-                  </button>
+            </button>
             
-                  <button 
+            <button 
               onClick={() => setIsHandRaiseQueueOpen(true)}
               className={`p-3 rounded-full ${
                 handRaiseQueue.length > 0 ? 'bg-yellow-500' : 'bg-gray-700'
@@ -670,16 +703,16 @@ export default function VideoConference() {
                   {handRaiseQueue.length}
                 </span>
               )}
-                  </button>
+            </button>
 
-                  <button 
+            <button 
               onClick={() => setIsKeyboardShortcutsOpen(true)}
               className="p-3 rounded-full bg-gray-700 hover:bg-opacity-80"
               title="Keyboard Shortcuts"
-                  >
+            >
               <Keyboard className="w-5 h-5 text-white" />
-                  </button>
-                </div>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -687,14 +720,14 @@ export default function VideoConference() {
       {isSettingsOpen && (
         <div className="absolute right-0 top-12 w-80 bg-gray-800 rounded-lg shadow-xl border border-gray-700 overflow-hidden">
           <div className="p-4 border-b border-gray-700 flex items-center justify-between">
-            <h3 className="text-white font-medium">Settings</h3>
-                <button 
+            {/* <h3 className="text-white font-medium">Settings</h3> */}
+            <button 
               onClick={() => setIsSettingsOpen(false)}
-                  className="text-gray-400 hover:text-white"
-                >
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
+              className="text-gray-400 hover:text-white"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
           
           <div className="p-4 space-y-4">
             <div>
@@ -715,7 +748,7 @@ export default function VideoConference() {
               </select>
             </div>
 
-                        <div>
+            <div>
               <label className="text-gray-400 text-sm block mb-2">Microphone</label>
               <select
                 value={selectedDevice.audio}
@@ -731,9 +764,9 @@ export default function VideoConference() {
                   </option>
                 ))}
               </select>
-                </div>
+            </div>
 
-                        <div>
+            <div>
               <label className="text-gray-400 text-sm block mb-2">Background Blur</label>
               <button
                 onClick={toggleBlur}
@@ -746,11 +779,11 @@ export default function VideoConference() {
                     blur ? 'right-1' : 'left-1'
                   }`}
                 />
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showVirtualBackground && (
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50">
@@ -762,7 +795,7 @@ export default function VideoConference() {
             }}
             currentBackground={currentBackground}
           />
-                      </div>
+        </div>
       )}
 
       {showPolls && (
@@ -771,7 +804,7 @@ export default function VideoConference() {
             onClose={() => setShowPolls(false)}
             isHost={participants[0].role === 'teacher'}
           />
-                      </div>
+        </div>
       )}
 
       {showChat && (
@@ -781,13 +814,13 @@ export default function VideoConference() {
             participants={participants}
             currentUser={participants[0]}
           />
-                    </div>
+        </div>
       )}
 
       {showNotes && (
         <div className="absolute top-1/2 right-4 transform -translate-y-1/2 z-50">
           <MeetingNotes onClose={() => setShowNotes(false)} />
-                  </div>
+        </div>
       )}
 
       {isHandRaiseQueueOpen && (
@@ -796,8 +829,8 @@ export default function VideoConference() {
             <h3 className="text-white font-medium">Hand Raise Queue</h3>
             <button onClick={() => setIsHandRaiseQueueOpen(false)} className="text-gray-400 hover:text-white">
               <X size={20} />
-                        </button>
-                      </div>
+            </button>
+          </div>
           <div className="space-y-2 max-h-60 overflow-y-auto">
             {handRaiseQueue.map(item => (
               <div key={item.id} className="flex items-center justify-between bg-gray-700 rounded-lg p-3">
@@ -808,7 +841,7 @@ export default function VideoConference() {
                 <span className="text-gray-400 text-sm">
                   {new Date(item.timestamp).toLocaleTimeString()}
                 </span>
-            </div>
+              </div>
             ))}
           </div>
         </div>
@@ -820,7 +853,7 @@ export default function VideoConference() {
             <h3 className="text-white font-medium">Keyboard Shortcuts</h3>
             <button onClick={() => setIsKeyboardShortcutsOpen(false)} className="text-gray-400 hover:text-white">
               <X size={20} />
-          </button>
+            </button>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
@@ -840,13 +873,12 @@ export default function VideoConference() {
               <kbd className="px-2 py-1 bg-gray-700 rounded text-white">Alt + N</kbd>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-400">Screen Share</span>
+              {/* <span className="text-gray-400">Screen Share</span> */}
               <kbd className="px-2 py-1 bg-gray-700 rounded text-white">Alt + S</kbd>
-        </div>
-      </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 }
-
