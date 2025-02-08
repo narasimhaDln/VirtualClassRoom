@@ -1,4 +1,20 @@
 # React + Vite
+
+
+Practical Images of Project:
+Live Class ScreenShot:
+![IMG_20250208_214523](https://github.com/user-attachments/assets/c4e31777-43f5-46bc-81c9-7940ef83e37f)
+Login Page ScreenShot:
+![IMG_20250208_214456](https://github.com/user-attachments/assets/96c0fc7d-43f7-4310-9a48-e9f692555e56)
+Assignments Page ScreenShot:
+![IMG_20250208_214509](https://github.com/user-attachments/assets/0655a178-8a11-4710-aa4b-00d07226e2a5)
+
+
+Deployment URL:https://virtual-class-room-r3dw.vercel.app/
+
+Git Hub URL:https://github.com/narasimhaDln/VirtualClassRoom/tree/main/vite-project
+
+
 ***Video****
 => Brakeout Room Component:
 1 .Room Management: Create and manage multiple virtual breakout rooms where participants can be divided into smaller groups for focused discussions or activities.
