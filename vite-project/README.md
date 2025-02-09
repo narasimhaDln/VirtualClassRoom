@@ -1,6 +1,25 @@
-# React + Vite
+Project Title:Virtual Class Room
+----------------------------------
+##Introduction
+📚 Virtual Classroom Platform
+Introduction
+Welcome to the Virtual Classroom, an innovative online learning platform designed to provide an interactive and engaging experience for students and instructors. Our platform offers a seamless environment for conducting live classes, managing assignments, accessing learning resources, and personalizing user settings.
 
-Practical Images of Project:
+Features:
+✨ User Authentication – Secure login and signup system for new and existing users.
+📅 Class Scheduling – Integrated calendar to book and manage class schedules.
+🎥 Live Video Conferencing – Join live classes with video/microphone controls, similar to Google Meet.
+📚 Learning Resources – Access JavaScript notes, React notes, MDN documentation, and other study materials.
+📝 Assignments Section – Manage coursework and submissions efficiently.
+⚙ Profile & Settings – Update personal details, change passwords, and customize preferences.
+📡 Live Class Recording – Record and review classes for future reference.
+
+Our goal is to enhance the online learning experience by combining real-time interaction with flexible study tools. Whether you're attending a lecture, collaborating with peers, or reviewing past sessions, our platform ensures a smooth and productive experience.
+
+##Project Type:
+->FrontEnd
+-FirBase Console
+**DeployMent and Project Images:**
 Live Class ScreenShot:
 ![IMG_20250208_214523](https://github.com/user-attachments/assets/c4e31777-43f5-46bc-81c9-7940ef83e37f)
 Login Page ScreenShot:
@@ -11,6 +30,78 @@ Assignments Page ScreenShot:
 Deployment URL:https://virtual-class-room-r3dw.vercel.app/
 
 Git Hub URL:https://github.com/narasimhaDln/VirtualClassRoom/tree/main/vite-project
+
+***Directory Structure**
+-------FrontEnd--------
+/src  
+│── /components  
+│   ├── /assignments  
+│   ├── /hooks  
+│   ├── /settings  
+│   ├── /user  
+│   ├── /video  
+│   ├── /routing  
+│  
+│── App.css  
+│── App.jsx  
+│── index.css  
+│── main.jsx  
+
+#### Features #####
+✨ User Authentication – Secure login and signUp system for new and existing users.
+📅 Class Scheduling – Integrated calendar to book and manage class schedules.
+🎥 Live Video Conferencing – Join live classes with video/microphone controls, similar to Google Meet.
+📚 Learning Resources – Access JavaScript notes, React notes, MDN documentation, and other study materials.
+📝 Assignments Section – Manage coursework and submissions efficiently.
+⚙ Profile & Settings – Update personal details, change passwords, and customize preferences.
+📡 Live Class Recording – Record and review classes for future reference.
+
+## Installation & Getting started
+-----bash->React + Vite<-----
+1️⃣ Install Vite and Create a New Project:
+
+->npm create vite@latest my-vite-app
+
+2️⃣ Navigate into the Project Folder
+
+->cd my-vite-app
+
+3️⃣ Install Dependencies
+
+npm install
+
+4️⃣ Start the Development Server
+
+npm run dev
+
+<-----GitHub Commands-->
+1️⃣ Initialize a Git Repository
+->git init
+2️⃣ Add All Project Files to Git
+->git add .
+3️⃣ Commit the Changes
+->git commit -m "Initial commit"
+4️⃣ Create a New Repository on GitHub
+->Go to GitHub
+->Click New Repository
+->Name your repository and DO NOT initialize ->it with a README (since we already have ->files locally).
+->Copy the remote repository HTTPS URL.
+5️⃣ Link Your Local Repo to GitHub
+->git remote add origin <your-repository-url>
+6️⃣ Push Your Code to GitHub
+->git branch -M main
+->git push -u origin main
+7️⃣ Pull Latest Changes (If Needed)
+->git pull origin main
+8️⃣ To Push Future Updates
+->git add .
+->git commit -m "Updated feature XYZ"
+->git push origin main
+
+
+
+Practical Images of Project:
+
 
 **\*Video\*\***
 => Brakeout Room Component:
