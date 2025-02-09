@@ -31,6 +31,20 @@ Deployment URL:https://virtual-class-room-r3dw.vercel.app/
 
 Git Hub URL:https://github.com/narasimhaDln/VirtualClassRoom/tree/main/vite-project
 
+
+
+**Recording Videos of our Project**
+
+1.Question and answers video:https://drive.google.com/file/d/1odvjlx972EHShQ4_fZUMQ8-nkow5TWwR/view?usp=sharing
+
+2.Group Presentation video:https://drive.google.com/file/d/1KsweosGCBa5xW9U_5xdWXn2SdHU8Hsz0/view?usp=sharing
+
+3.Team Lead Presentation Video:https://drive.google.com/file/d/1VklRbA-4OatfUyGVnLNCb5Hb0zYAeYw4/view?usp=sharing
+
+4.Team Lead Presentation video on Codebase:https://drive.google.com/file/d/1SAhQ0PS9XUmRAsQmgRW6pubcQf8E5AoD/view?usp=sharing
+
+
+
 ***Directory Structure**
 -------FrontEnd--------
 /src  
