@@ -1,5 +1,45 @@
+
 {
-    "rewrites": [
-      { "source": "/(.*)", "destination": "/" }
+    "routes": [
+        {
+            "src": "/",
+            "dest": "/"
+        },
+        {
+            "src": "/login",
+            "dest": "/"
+        },
+        {
+            "src": "/register",
+            "dest": "/"
+        },
+        {
+            "src": "/video-conference",
+            "dest": "/"
+        },
+        {
+            "src": "/resources",
+            "dest": "/"
+        },
+        {
+            "src": "/calender",
+            "dest": "/"
+        },
+        {
+            "src": "/courses",
+            "dest": "/"
+        },
+        {
+            "src": "/profile",
+            "dest": "/"
+        },
+        {
+            "src": "/settings",
+            "dest": "/"
+        },
+        {
+            "src": "/change-password",
+            "dest": "/"
+        }
     ]
-  }
+}
