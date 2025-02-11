@@ -37,7 +37,7 @@ import Courses from "./Routing/Courses";
 import Profile from "./Components/User/Profile";
 import SettingsPage from "./Components/Settings/SettingsPage";
 import ChangePassword from "./Components/Settings/ChangePassword";
-import ErrorPage from "./Components/User/errorPage";
+import ErrorPage from "./ErrorPage/ErrorPage";
 function MainApp() {
   const [activeTab, setActiveTab] = useState("whiteboard");
   const [isRaiseHand, setIsRaiseHand] = useState(false);
