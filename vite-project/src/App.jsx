@@ -25,6 +25,7 @@ import Courses from './Routing/Courses';
 import Profile from './Components/User/Profile';
 import SettingsPage from "./Components/Settings/SettingsPage"
 import ChangePassword from './Components/Settings/ChangePassword';
+import ErrorPage from './Components/User/errorPage';
 function MainApp() {
   const [activeTab, setActiveTab] = useState('whiteboard');
   const [isRaiseHand, setIsRaiseHand] = useState(false);
@@ -558,6 +559,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/login" />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/*" element={<ErrorPage />} />
             <Route path="/register" element={<Register />} />
             <Route
               path="/video-conference"
