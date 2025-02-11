@@ -68,7 +68,7 @@ Git Hub URL:https://github.com/narasimhaDln/VirtualClassRoom/tree/main/vite-proj
 📚 Learning Resources – Access JavaScript notes, React notes, MDN documentation, and other study materials.
 📝 Assignments Section – Manage coursework and submissions efficiently.
 ⚙ Profile & Settings – Update personal details, change passwords, and customize preferences.
-📡 Live Class Recording – Record and review classes for future reference.
+📡 Live Class Recording – Record and review classes for future reference..
 
 ## Installation & Getting started
 -----bash->React + Vite<-----
