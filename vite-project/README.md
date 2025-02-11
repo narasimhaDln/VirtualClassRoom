@@ -10,7 +10,7 @@ Features:
 📅 Class Scheduling – Integrated calendar to book and manage class schedules.
 🎥 Live Video Conferencing – Join live classes with video/microphone controls, similar to Google Meet.
 📚 Learning Resources – Access JavaScript notes, React notes, MDN documentation, and other study materials.
-📝 Assignments Section – Manage coursework and submissions efficiently.
+📝 Assignments Section – Manage coursework and submissions efficiently..
 ⚙ Profile & Settings – Update personal details, change passwords, and customize preferences.
 📡 Live Class Recording – Record and review classes for future reference.
 
