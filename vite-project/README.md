@@ -27,7 +27,7 @@ Login Page ScreenShot:
 Assignments Page ScreenShot:
 ![IMG_20250208_214509](https://github.com/user-attachments/assets/0655a178-8a11-4710-aa4b-00d07226e2a5)
 
-Deployment URL:https://virtual-class-room-r3dw.vercel.app/
+Deployment URL:silly-bonbon-e1d209.netlify.app
 
 Git Hub URL:https://github.com/narasimhaDln/VirtualClassRoom/tree/main/vite-project
 
@@ -118,7 +118,7 @@ Practical Images of Project:
 
 
 **\*Video\*\***
-=> Brakeout Room Component:
+=> BrakeOut Room Component:
 1 .Room Management: Create and manage multiple virtual breakout rooms where participants can be divided into smaller groups for focused discussions or activities.
 
 2 .Participant Controls: Allow hosts/teachers to manually assign or randomly distribute participants into different rooms, with the ability to move participants between rooms.
